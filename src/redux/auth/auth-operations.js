@@ -12,34 +12,60 @@ const token = {
   },
 };
 
-const signUp = createAsyncThunk("auth/signUp", async (credentials) => {
-  try {
-    const { data } = await axios.post("/users/signup", credentials);
-    token.set(data.token);
-    return data;
-  } catch (error) {
-    //  Добавить обработку ошибок error.message
-  }
-});
+const signUp = createAsyncThunk(
+  "auth/signUp",
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.post("/users/signup", credentials);
+      token.set(data.token);
+      return data;
+    } catch (error) {
+      const status = error.response ? error.response.status : 500;
 
-const logIn = createAsyncThunk("auth/login", async (credentials) => {
-  try {
-    const { data } = await axios.post("/users/login", credentials);
-    token.set(data.token);
-    return data;
-  } catch (error) {
-    //  Добавить обработку ошибок error.message
+      if (status === 400) {
+        const message = "This email is already taken";
+        alert(message);
+        return rejectWithValue(message);
+      } else {
+        return rejectWithValue(error.message);
+      }
+    }
   }
-});
+);
 
-const logOut = createAsyncThunk("auth/logout", async () => {
-  try {
-    await axios.post("/users/logout");
-    token.unset();
-  } catch (error) {
-    // Добавить обработку error.message
+const logIn = createAsyncThunk(
+  "auth/login",
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.post("/users/login", credentials);
+      token.set(data.token);
+      return data;
+    } catch (error) {
+      const status = error.response ? error.response.status : 500;
+
+      if (status === 400) {
+        const message = "Email or password is incorrect";
+
+        alert(message);
+        return rejectWithValue(message);
+      } else {
+        return rejectWithValue(error.message);
+      }
+    }
   }
-});
+);
+
+const logOut = createAsyncThunk(
+  "auth/logout",
+  async (_, { rejectWithValue }) => {
+    try {
+      await axios.post("/users/logout");
+      token.unset();
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 
 const fetchCurrentUser = createAsyncThunk(
   "auth/refresh",
@@ -55,7 +81,9 @@ const fetchCurrentUser = createAsyncThunk(
     try {
       const { data } = await axios.get("users/current");
       return data;
-    } catch (error) {}
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
   }
 );
 

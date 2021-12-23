@@ -1,37 +1,49 @@
-import s from "./ContactList.module.css";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import {
-  fetchContacts,
-  deleteContact,
-} from "redux/contacts/contacts-operations";
-import { getFilteredContacts } from "redux/contacts/contacts-selectors";
+  List,
+  ListItemText,
+  ListItem,
+  Button,
+  Typography,
+} from "@mui/material";
+import { contactsSelectors, contactsOperations } from "redux/contacts";
 
 export default function ContactList() {
   const dispatch = useDispatch();
+  const contacts = useSelector(contactsSelectors.getContacts);
 
   useEffect(() => {
-    dispatch(fetchContacts());
+    dispatch(contactsOperations.fetchContacts());
   }, [dispatch]);
 
-  const visibleContacts = useSelector(getFilteredContacts);
+  const visibleContacts = useSelector(contactsSelectors.getFilteredContacts);
 
   return (
-    <ul className={s.list}>
-      {visibleContacts.map(({ name, id, number }) => (
-        <li className={s.item} key={id}>
-          <span className={s.contactInfo}>
-            {name}: {number}
-          </span>
-          <button
-            className="button"
-            type="button"
-            onClick={() => dispatch(deleteContact(id))}
-          >
-            Delete
-          </button>
-        </li>
-      ))}
-    </ul>
+    <>
+      {contacts.length > 0 && (
+        <List sx={{ width: "100%" }}>
+          {visibleContacts.map(({ name, id, number }) => (
+            <ListItem key={id}>
+              <ListItemText primary={name} secondary={number} />
+              <Button
+                type="button"
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+                onClick={() => dispatch(contactsOperations.deleteContact(id))}
+              >
+                Delete
+              </Button>
+            </ListItem>
+          ))}
+        </List>
+      )}
+
+      {contacts.length === 0 && (
+        <Typography variant="h6" sx={{ mt: 2, mb: 2 }}>
+          Contact list empty
+        </Typography>
+      )}
+    </>
   );
 }

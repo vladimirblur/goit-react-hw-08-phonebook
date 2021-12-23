@@ -1,5 +1,21 @@
-import s from "./Section.module.css";
+import { Box } from "@mui/system";
+import PropTypes from "prop-types";
 
-export default function Section({ children }) {
-  return <div className={s.section}>{children}</div>;
+Section.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+export default function Section({ children, ...options }) {
+  return (
+    <Box
+      component="section"
+      sx={{
+        pt: 8,
+        pb: 4,
+      }}
+      {...options}
+    >
+      {children}
+    </Box>
+  );
 }

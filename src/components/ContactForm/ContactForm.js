@@ -1,15 +1,13 @@
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { useSelector, useDispatch } from "react-redux";
 import { contactsOperations, contactsSelectors } from "redux/contacts";
-import s from "./ContactForm.module.css";
+import { Box, TextField } from "@mui/material";
+import SubmitFormButton from "components/SubmitFormButton";
 
 export default function ContactForm() {
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
 
-  const nameInputID = uuidv4();
-  const numberInputID = uuidv4();
   const contacts = useSelector(contactsSelectors.getContacts);
   const dispatch = useDispatch();
 
@@ -41,39 +39,41 @@ export default function ContactForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className={s.Form}>
-      <label htmlFor={nameInputID} className={s.label}>
-        Name
-      </label>
-      <input
-        className={s.input}
-        type="text"
-        name="name"
-        value={name}
-        id={nameInputID}
-        onChange={handleInputChange}
-        pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-        title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
+    <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+      <TextField
         required
+        fullWidth
+        autoComplete="given-name"
+        name="name"
+        id="given-name"
+        label="Name"
+        margin="normal"
+        value={name}
+        onChange={handleInputChange}
+        inputProps={{
+          inputMode: "text",
+          pattern: "^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$",
+          title:
+            "Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer",
+        }}
       />
 
-      <label htmlFor={numberInputID} className={s.label}>
-        Number
-      </label>
-      <input
-        className={s.input}
-        type="tel"
+      <TextField
+        required
+        fullWidth
+        autoComplete="given-number"
+        inputProps={{
+          inputMode: "tel",
+        }}
         name="number"
         value={number}
-        id={numberInputID}
         onChange={handleInputChange}
-        pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-        title="Номер телефона должен состоять цифр и может содержать пробелы, тире, круглые скобки и может начинаться с +"
-        required
+        id="given-number"
+        label="Number"
+        margin="normal"
       />
-      <button type="submit" className="button">
-        Add contact
-      </button>
-    </form>
+
+      <SubmitFormButton>Add contact</SubmitFormButton>
+    </Box>
   );
 }

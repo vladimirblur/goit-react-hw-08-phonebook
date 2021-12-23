@@ -1,58 +1,74 @@
+import * as React from "react";
+import { Link as RouterLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { authOperations, authSelectors } from "redux/auth";
+import Link from "@mui/material/Link";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import LockedIcon from "@mui/icons-material/DoDisturbOnOutlined";
+import Container from "@mui/material/Container";
 import Section from "components/Section";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { authOperations } from "redux/auth";
-import s from "./LoginView.module.css";
+import Copyright from "components/Copyright";
+import EmailInputField from "components/EmailInputField";
+import PasswordInputField from "components/PasswordInputField";
+import FormTitle from "components/FormTitle";
+import SubmitFormButton from "components/SubmitFormButton";
 
-export default function LoginView() {
+export default function LogInView() {
   const dispatch = useDispatch();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const error = useSelector(authSelectors.getError);
 
-  const handleChange = ({ target: { name, value } }) => {
-    switch (name) {
-      case "email":
-        return setEmail(value);
-      case "password":
-        return setPassword(value);
-      default:
-        return;
-    }
-  };
-
-  const handleSubmit = (event) => {
+  const onSubmit = (event) => {
     event.preventDefault();
-    dispatch(authOperations.logIn({ email, password }));
-    setEmail("");
-    setPassword("");
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const credentials = {
+      email: formData.get("email"),
+      password: formData.get("password"),
+    };
+
+    dispatch(authOperations.logIn(credentials));
   };
 
   return (
     <Section>
-      <h1>Login</h1>
+      <Container maxWidth="xs">
+        <Box
+          sx={{
+            mb: 5,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <FormTitle icon={LockedIcon} title={"Login"} />
 
-      <form onSubmit={handleSubmit} className={s.form} autoComplete="off">
-        <label className={s.label}>
-          Email
-          <input
-            type="email"
-            name="email"
-            value={email}
-            onChange={handleChange}
-          />
-        </label>
-        <label className={s.label}>
-          Password
-          <input
-            type="password"
-            name="password"
-            value={password}
-            onChange={handleChange}
-          />
-        </label>
+          <Box component="form" onSubmit={onSubmit} sx={{ mt: 3 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <EmailInputField error={error} />
+              </Grid>
 
-        <button type="submit">Sign Up</button>
-      </form>
+              <Grid item xs={12}>
+                <PasswordInputField error={error} />
+              </Grid>
+            </Grid>
+
+            <SubmitFormButton>Log In</SubmitFormButton>
+
+            <Grid container justifyContent="flex-end">
+              <Grid item>
+                <Link component={RouterLink} variant="body2" to="/register">
+                  Don't have an account? Sign up
+                </Link>
+              </Grid>
+            </Grid>
+          </Box>
+        </Box>
+
+        <Copyright />
+      </Container>
     </Section>
   );
 }

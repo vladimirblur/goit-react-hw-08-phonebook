@@ -20,7 +20,7 @@ const filter = createReducer("", {
 
 const loading = createReducer(false, {
   [addContact.pending]: () => true,
-  [addContact.pending]: () => false,
+  [addContact.fulfilled]: () => false,
   [addContact.rejected]: () => false,
   [deleteContact.pending]: () => true,
   [deleteContact.fulfilled]: () => false,
